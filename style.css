@@ -1,0 +1,401 @@
+/* Immersive 3D Zoom style - Cruz Celeste (Background & Cross Only) */
+:root {
+    --bg-color: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    overflow-x: hidden;
+    height: auto;
+    /* Hide scrollbar but preserve scroll functionality */
+    scrollbar-width: none; /* Firefox */
+}
+
+body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+/* Hero Section Wrapper */
+.hero-section {
+    position: relative;
+    height: 380vh; /* Scroll track length for both zoom and horizontal scroll */
+    width: 100%;
+    background-color: var(--bg-color);
+}
+
+/* Sticky Viewport Container inside the hero section */
+#viewport {
+    position: sticky;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 10;
+    background-color: var(--bg-color);
+}
+
+/* Base style for all layers */
+.layer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover; /* Forces layers to align and stretch uniformly */
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+    pointer-events: none;
+    /* Boost contrast and brightness for a vivid, premium look */
+    filter: contrast(1.05) brightness(1.08);
+    /* Improve browser image upscaling scaling sharpness */
+    image-rendering: -webkit-optimize-contrast;
+}
+
+/* Z-indexing layers */
+#layer-fondo {
+    z-index: 11;
+}
+
+#layer-cielo {
+    z-index: 11.5;
+    opacity: 0; /* Animated via GSAP scroll */
+}
+
+#layer-cruz {
+    z-index: 12;
+}
+
+#layer-nubes {
+    z-index: 13; /* Placed behind the cards (z-index: 14) */
+    opacity: 0; /* Animated via GSAP scroll */
+    pointer-events: none; /* Allows scrolling and hovering cards through the clouds */
+}
+
+/* Interactive Canvas overlay */
+#particleCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 16;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   FLOATING HORIZONTAL GALLERY STYLING
+   ========================================================================== */
+.gallery-container {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0; /* Gaps are handled inside groups */
+    padding: 0; /* Padding is handled inside groups */
+    width: max-content;
+    z-index: 14; /* Placed on top of the clouds (z-index: 13) */
+    pointer-events: auto; /* Re-enable pointer events for hover/click interaction */
+    will-change: transform;
+}
+
+/* Screen group wrapper for card organization (2 cards per screen) */
+.gallery-group {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 140px; /* Space between the two cards on screen */
+    flex-shrink: 0;
+    box-sizing: border-box;
+    padding: 0 80px;
+}
+
+.group-intro {
+    justify-content: center;
+    align-items: center;
+}
+
+/* Gallery Introductory Card */
+.gallery-intro {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-right: 20px;
+    pointer-events: none;
+}
+
+.gallery-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 4.5vw, 3.8rem);
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    margin-bottom: 15px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.gallery-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.88rem;
+    color: #f59e0b; /* Mystic golden accent */
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    font-weight: 600;
+    text-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+}
+
+/* Elegant Floating Glassmorphic Cards */
+.art-card-wrapper {
+    display: block;
+    width: 460px; /* Epic width (increased from 400px) */
+    height: 680px; /* Epic height (increased from 580px) */
+    perspective: 1000px; /* Adds immersive 3D depth to the scroll rotation */
+    flex-shrink: 0;
+    transition: transform 0.5s ease;
+}
+
+.art-card {
+    width: 460px; /* Matches wrapper */
+    height: 680px;
+    border-radius: 28px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(13, 17, 28, 0.96) 0%, rgba(6, 8, 14, 0.98) 100%); /* Solid velvet obsidian backing */
+    border: 1.5px solid rgba(255, 255, 255, 0.08); /* Sophisticated thin border */
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.12), 0 20px 50px rgba(0, 0, 0, 0.65);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s ease;
+    pointer-events: auto;
+}
+
+/* Standalone highlighted card layout (La Última Cena) - MASSIVE EPIC SIZE */
+.group-single .art-card-wrapper {
+    width: 780px; /* Centered masterpiece scale */
+    height: 740px;
+}
+.group-single .art-card {
+    width: 780px;
+    height: 740px;
+}
+
+/* Dynamic thin borders matching the painting color themes by default */
+.card-blue {
+    border-color: rgba(6, 182, 212, 0.25);
+}
+.card-blue .card-number {
+    border: 1.5px solid rgba(6, 182, 212, 0.45);
+    color: #06b6d4;
+}
+
+.card-pink {
+    border-color: rgba(168, 85, 247, 0.25);
+}
+.card-pink .card-number {
+    border: 1.5px solid rgba(168, 85, 247, 0.45);
+    color: #a855f7;
+}
+
+.card-yellow {
+    border-color: rgba(234, 179, 8, 0.25);
+}
+.card-yellow .card-number {
+    border: 1.5px solid rgba(234, 179, 8, 0.45);
+    color: #eab308;
+}
+
+.card-green {
+    border-color: rgba(16, 185, 129, 0.25);
+}
+.card-green .card-number {
+    border: 1.5px solid rgba(16, 185, 129, 0.45);
+    color: #10b981;
+}
+
+/* Card number badge at top right with subtle glass background */
+.card-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 14px;
+}
+
+.card-number {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 15, 30, 0.65); /* Keeps number legible */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Card image wrapper and image */
+.card-image-wrapper {
+    height: 440px; /* Huge image window for epic painting presentation */
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Enlarge image wrapper for the standalone card */
+.group-single .card-image-wrapper {
+    height: 500px; /* Colossal scale for La Última Cena */
+}
+
+.card-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Card Text Info - integrated plaque design flush with card bottom borders */
+.card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.02); /* Very subtle velvet overlay */
+    border-top: 1px solid rgba(255, 255, 255, 0.05); /* Clean partition line */
+    border-radius: 0 0 24px 24px;
+    padding: 18px 24px;
+    margin: 0 -24px -24px -24px; /* Pulls it flush with card bottom/sides */
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff; /* Crisp white titles */
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card-desc {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.82rem;
+    color: #cbd5e1; /* Soft silver text */
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+/* Interactive Hover States - Neon borders and colossal glowing shadows */
+.art-card:hover {
+    transform: translateY(-16px) scale(1.02);
+}
+
+.card-blue:hover {
+    border-color: rgba(6, 182, 212, 0.85);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), 
+                0 25px 60px rgba(0, 0, 0, 0.8), 
+                0 0 45px rgba(6, 182, 212, 0.4);
+}
+
+.card-pink:hover {
+    border-color: rgba(168, 85, 247, 0.85);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), 
+                0 25px 60px rgba(0, 0, 0, 0.8), 
+                0 0 45px rgba(168, 85, 247, 0.4);
+}
+
+.card-yellow:hover {
+    border-color: rgba(234, 179, 8, 0.85);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), 
+                0 25px 60px rgba(0, 0, 0, 0.8), 
+                0 0 45px rgba(234, 179, 8, 0.4);
+}
+
+.card-green:hover {
+    border-color: rgba(16, 185, 129, 0.85);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), 
+                0 25px 60px rgba(0, 0, 0, 0.8), 
+                0 0 45px rgba(16, 185, 129, 0.4);
+}
+
+.art-card:hover .card-image-wrapper img {
+    transform: scale(1.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .gallery-container {
+        gap: 0;
+        padding: 0;
+    }
+    
+    .gallery-group {
+        flex-direction: column;
+        gap: 20px;
+        padding: 0 16px;
+    }
+    
+    .gallery-intro {
+        width: 280px;
+        margin-right: 0;
+        text-align: center;
+    }
+    
+    .art-card-wrapper {
+        width: 280px;
+        height: 380px;
+    }
+    
+    .art-card {
+        width: 280px;
+        height: 380px;
+        padding: 6px;
+    }
+    
+    .card-image-wrapper {
+        height: 220px;
+        margin-bottom: 8px;
+    }
+
+    .group-single .art-card-wrapper {
+        width: 310px;
+        height: 440px;
+    }
+
+    .group-single .art-card {
+        width: 310px;
+        height: 440px;
+    }
+
+    .group-single .card-image-wrapper {
+        height: 280px;
+    }
+    
+    .card-info {
+        padding: 10px 14px;
+        gap: 4px;
+    }
+    
+    .card-title {
+        font-size: 1.15rem;
+    }
+
+    .card-desc {
+        font-size: 0.72rem;
+        line-height: 1.4;
+    }
+}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cruz Celeste - Galería Interactiva</title>
+    <meta name="description" content="Un viaje visual interactivo y galería de arte católico contemporáneo.">
+    
+    <!-- Google Fonts: Playfair Display (Serif) & Montserrat (Sans-serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for scroll-linked animations and smooth mouse tilt -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Sticky Hero Wrapper (determines pinning duration) -->
+    <div class="hero-section">
+        <!-- Fixed Viewport Container for the Zoom Layers and Gallery -->
+        <div id="viewport">
+            <!-- Layer 1: Background Waves -->
+            <img src="Imagenes/fondo.jpg" id="layer-fondo" class="layer" alt="Fondo de Ondas">
+            
+            <!-- Layer 1.5: Sky (Heaven transition background) -->
+            <img src="Imagenes/nubes/cielo.jpg" id="layer-cielo" class="layer" alt="Cielo de Fondo">
+            
+            <!-- Layer 2: Transparent Cross -->
+            <img src="Imagenes/cruzAZUL.png" id="layer-cruz" class="layer" alt="Cruz Celeste">
+
+            <!-- Floating Gallery Container (Horizontal list overlay) -->
+            <div class="gallery-container">
+                <!-- Group 0: Intro Title -->
+                <div class="gallery-group group-intro">
+                    <div class="gallery-intro">
+                        <h2 class="gallery-title">Galería de Arte</h2>
+                        <p class="gallery-subtitle">Colección Arte Católico</p>
+                    </div>
+                </div>
+
+                <!-- Group 1: Blue & Pink Pair -->
+                <div class="gallery-group">
+                    <!-- Card 1 -->
+                    <article class="art-card card-blue">
+                        <div class="card-header">
+                            <span class="card-number">01</span>
+                        </div>
+                        <div class="card-image-wrapper">
+                            <img src="Imagenes/arte_catolico/cruz azul.jpeg" alt="Cruz Azul">
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">Cruz Azul</h3>
+                            <p class="card-desc">Relieve contemporáneo de la cruz celeste con ondas de resina y destellos cristalinos.</p>
+                        </div>
+                    </article>
+
+                    <!-- Card 2 -->
+                    <article class="art-card card-pink">
+                        <div class="card-header">
+                            <span class="card-number">02</span>
+                        </div>
+                        <div class="card-image-wrapper">
+                            <img src="Imagenes/arte_catolico/cruz amarilla.jpeg" alt="Cruz Amarilla">
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">Cruz Amarilla</h3>
+                            <p class="card-desc">Fusión de pigmentos dorados y ondas texturizadas inspiradas en la luz solar divina.</p>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Group 2: Yellow & Green Pair -->
+                <div class="gallery-group">
+                    <!-- Card 3 -->
+                    <article class="art-card card-yellow">
+                        <div class="card-header">
+                            <span class="card-number">03</span>
+                        </div>
+                        <div class="card-image-wrapper">
+                            <img src="Imagenes/arte_catolico/cruz amarilla madera..jpeg" alt="Cruz de Madera Amarilla">
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">Cruz de Madera</h3>
+                            <p class="card-desc">Madera tallada con relieves dorados tradicionales y texturas orgánicas envejecidas.</p>
+                        </div>
+                    </article>
+
+                    <!-- Card 4 -->
+                    <article class="art-card card-green">
+                        <div class="card-header">
+                            <span class="card-number">04</span>
+                        </div>
+                        <div class="card-image-wrapper">
+                            <img src="Imagenes/arte_catolico/cruz morada.jpeg" alt="Cruz Morada">
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">Cruz Morada</h3>
+                            <p class="card-desc">Relieve violeta místico que evoca espiritualidad, penitencia y reflexión litúrgica profunda.</p>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Group 3: Blue & Pink Pair -->
+                <div class="gallery-group">
+                    <!-- Card 5 -->
+                    <article class="art-card card-blue">
+                        <div class="card-header">
+                            <span class="card-number">05</span>
+                        </div>
+                        <div class="card-image-wrapper">
+                            <img src="Imagenes/arte_catolico/sagrado corazon" alt="Sagrado Corazón">
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">Sagrado Corazón</h3>
+                            <p class="card-desc">Representación clásica devocional del Sagrado Corazón con acabados esculpidos a mano.</p>
+                        </div>
+                    </article>
+
+                    <!-- Card 6 -->
+                    <article class="art-card card-pink">
+                        <div class="card-header">
+                            <span class="card-number">06</span>
+                        </div>
+                        <div class="card-image-wrapper">
+                            <img src="Imagenes/arte_catolico/sagrado corazon morado.jpeg" alt="Sagrado Corazón Violeta">
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">Corazón Violeta</h3>
+                            <p class="card-desc">Reinterpretación contemporánea en tonos violetas imperiales y destellos de pan de oro.</p>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Group 4: The Last Supper (Majestic & Standalone) -->
+                <div class="gallery-group group-single">
+                    <!-- Card 7 -->
+                    <article class="art-card card-yellow">
+                        <div class="card-header">
+                            <span class="card-number">07</span>
+                        </div>
+                        <div class="card-image-wrapper">
+                            <img src="Imagenes/arte_catolico/ultima cena.jpeg" alt="La Última Cena">
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">La Última Cena</h3>
+                            <p class="card-desc">Composición escultórica de la cena del Señor, con detalles de relieves tridimensionales.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <!-- Foreground clouds overlay -->
+            <img src="Imagenes/nubes/nubes.png" id="layer-nubes" class="layer" alt="Nubes de Primer Plano">
+
+            <!-- Interactive Floating Particles Canvas -->
+            <canvas id="particleCanvas"></canvas>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
