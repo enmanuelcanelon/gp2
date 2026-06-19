@@ -2,6 +2,27 @@
 gsap.registerPlugin(ScrollTrigger);
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Lenis Smooth Scroll
+    const lenis = new Lenis({
+        duration: 1.3,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth exponential ease
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 0.95
+    });
+
+    // Update ScrollTrigger on scroll
+    lenis.on('scroll', ScrollTrigger.update);
+
+    // Sync Lenis with GSAP's requestAnimationFrame
+    gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+    });
+
+    // Disable lag smoothing for instant synchronization
+    gsap.ticker.lagSmoothing(0);
+
     initZoomGalleryTimeline();
     initMouseParallax();
     initFloatingEmbers();
@@ -185,13 +206,25 @@ function initFloatingEmbers() {
     let width = canvas.width = window.innerWidth;
     let height = canvas.height = window.innerHeight;
     
+    // Capture real mouse position in pixels for repulsion physics
+    let mouse = { x: -1000, y: -1000 };
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+    
+    window.addEventListener('mouseleave', () => {
+        mouse.x = -1000;
+        mouse.y = -1000;
+    });
+
     window.addEventListener('resize', () => {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
     });
     
     const particles = [];
-    const count = 35;
+    const count = 45; // Increased slightly for richer density
     
     class Ember {
         constructor() {
@@ -202,18 +235,53 @@ function initFloatingEmbers() {
         reset() {
             this.x = Math.random() * width;
             this.y = height + Math.random() * 20;
-            this.size = Math.random() * 2.2 + 0.5;
-            this.speedY = Math.random() * 0.4 + 0.15;
-            this.opacity = Math.random() * 0.55 + 0.15;
-            // Mix cyan/teal and purple embers matching the cross's palette
-            this.color = Math.random() > 0.5 ? 'rgba(6, 182, 212,' : 'rgba(168, 85, 247,';
+            this.vx = 0;
+            this.vy = 0;
+            this.size = Math.random() * 2.2 + 0.6;
+            this.speedY = Math.random() * 0.45 + 0.15;
+            this.opacity = Math.random() * 0.6 + 0.2;
+            
+            // Mix colors matching card borders: Cyan, Pink, Gold/Yellow, Green
+            const colors = [
+                'rgba(6, 182, 212,',  // Cyan
+                'rgba(168, 85, 247,', // Pink/Purple
+                'rgba(234, 179, 8,',  // Gold/Yellow
+                'rgba(16, 185, 129,'  // Green
+            ];
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            
+            this.isStar = Math.random() > 0.6; // 40% are magical 4-point stars
             this.oscillationSpeed = Math.random() * 0.02 + 0.005;
-            this.oscillationWidth = Math.random() * 1.0;
+            this.oscillationWidth = Math.random() * 1.2;
             this.angle = Math.random() * Math.PI;
         }
         
         update() {
+            // Mouse Repulsion Physics
+            const dx = this.x - mouse.x;
+            const dy = this.y - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist < 180) {
+                const force = (180 - dist) / 180;
+                const forceAngle = Math.atan2(dy, dx);
+                // Push particles away gently
+                this.vx += Math.cos(forceAngle) * force * 1.6;
+                this.vy += Math.sin(forceAngle) * force * 1.6;
+            }
+            
+            // Apply air friction/drag
+            this.vx *= 0.93;
+            this.vy *= 0.93;
+            
+            // Upward drift movement
             this.y -= this.speedY;
+            
+            // Apply velocities
+            this.x += this.vx;
+            this.y += this.vy;
+            
+            // Wave oscillation
             this.angle += this.oscillationSpeed;
             this.x += Math.sin(this.angle) * this.oscillationWidth;
             
@@ -221,18 +289,33 @@ function initFloatingEmbers() {
             const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight);
             this.y -= this.speedY * (scrollPercent * 3.0);
             
-            if (this.y < -10) {
+            // Recycle if particle exits top or sides of screen
+            if (this.y < -20 || this.x < -20 || this.x > width + 20) {
                 this.reset();
             }
         }
         
         draw() {
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             ctx.fillStyle = this.color + this.opacity + ')';
-            ctx.shadowColor = this.color + '0.5)';
-            ctx.shadowBlur = this.size * 2.5;
-            ctx.fill();
+            ctx.shadowColor = this.color + '0.6)';
+            ctx.shadowBlur = this.size * (this.isStar ? 3.5 : 2.5);
+            
+            if (this.isStar) {
+                // Draw 4-point glowing star
+                const s = this.size;
+                ctx.moveTo(this.x, this.y - s * 2.2);
+                ctx.quadraticCurveTo(this.x, this.y, this.x + s * 2.2, this.y);
+                ctx.quadraticCurveTo(this.x, this.y, this.x, this.y + s * 2.2);
+                ctx.quadraticCurveTo(this.x, this.y, this.x - s * 2.2, this.y);
+                ctx.quadraticCurveTo(this.x, this.y, this.x, this.y - s * 2.2);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                // Draw standard glowing circular ember
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
     }
     
